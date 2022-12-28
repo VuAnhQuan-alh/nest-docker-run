@@ -9,6 +9,7 @@ import { VideosModule } from './videos/videos.module';
 import { SongsModule } from './songs/songs.module';
 import { CommentsModule } from './comments/comments.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -16,6 +17,22 @@ import { FavoritesModule } from './favorites/favorites.module';
     MongooseModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
         uri: config.get<string>('MONGOOSE_URL'),
+      }),
+      inject: [ConfigService],
+    }),
+    MailerModule.forRootAsync({
+      useFactory: (config: ConfigService) => ({
+        transport: {
+          host: config.get<string>('MAIL_HOST'),
+          secure: false,
+          auth: {
+            user: config.get<string>('MAIL_USER'),
+            pass: config.get<string>('MAIL_PASS'),
+          },
+        },
+        defaults: {
+          from: '"No Reply" <noreply@example.com>',
+        },
       }),
       inject: [ConfigService],
     }),

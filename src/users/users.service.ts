@@ -1,26 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Users, UsersDoc } from './users.schema';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { PayloadDto, ResponseDto } from '../commons/data.transfer.objects';
+import { DataAccountDto } from '../auth/auth.dto';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
+  constructor(
+    @InjectModel(Users.name) private readonly usersModel: Model<UsersDoc>,
+  ) {}
 
-  findAll() {
-    return `This action returns all users`;
-  }
+  async handlerProfile(data: PayloadDto): Promise<ResponseDto<DataAccountDto>> {
+    try {
+      const { sub } = data;
+      const { _id, email, username, avatar, content, roles } =
+        await this.usersModel.findOne({ _id: sub });
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+      return {
+        message: 'Get profile idol successful!',
+        data: { _id, email, username, avatar, content, roles },
+      };
+    } catch (e) {
+      throw new ForbiddenException(e);
+    }
   }
 }
