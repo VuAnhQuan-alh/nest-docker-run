@@ -22,14 +22,15 @@ export class AuthService {
 
   public async handlerSignUp(
     data: DataSignUpDto,
-  ): Promise<ResponseDto<string | null>> {
+  ): Promise<ResponseDto<object | null>> {
     try {
       const { email, username, password } = data;
       const isExistAccount = await this.usersModel.findOne({
         $or: [{ username: username }, { email: email }],
       });
 
-      if (isExistAccount) return { message: 'Account is exist!', data: null };
+      if (isExistAccount)
+        return { message: 'Account is exist!', attributes: null };
 
       const hash = await argon.hash(password);
       const account = await this.usersModel.create({
@@ -38,7 +39,7 @@ export class AuthService {
         hash_password: hash,
       });
       const { _id, roles, confirmed } = account;
-      const token = await this.signAccessToken({
+      const token = await this.signJwtToken({
         sub: _id,
         email,
         roles,
@@ -48,7 +49,10 @@ export class AuthService {
         'URI_LOCAL',
       )}/auth/activated?email=${email}&token=${token}`;
 
-      return { message: 'Please, active is account!', data: link };
+      return {
+        message: 'Please, active is account!',
+        attributes: { uri: link },
+      };
     } catch (e) {
       throw new ForbiddenException(e);
     }
@@ -83,10 +87,11 @@ export class AuthService {
         $or: [{ username: identifier }, { email: identifier }],
       });
       if (!account)
-        return { message: 'Identifier does not exist!', data: null };
+        return { message: 'Identifier does not exist!', attributes: null };
 
       const isMatched = await argon.verify(account.hash_password, password);
-      if (!isMatched) return { message: 'Password is wrong!', data: null };
+      if (!isMatched)
+        return { message: 'Password is wrong!', attributes: null };
 
       const { _id, email, username, avatar, content, roles, confirmed } =
         account;
@@ -99,9 +104,17 @@ export class AuthService {
 
       return {
         message: 'login successful!',
-        data: { _id, email, username, avatar, content, roles },
+        attributes: { _id, email, username, avatar, content, confirmed, roles },
         token: token as TokenDto,
       };
+    } catch (e) {
+      throw new ForbiddenException(e);
+    }
+  }
+
+  public async handlerRefreshToken(payload: PayloadDto): Promise<string> {
+    try {
+      return await this.signAccessToken(payload);
     } catch (e) {
       throw new ForbiddenException(e);
     }
@@ -136,7 +149,18 @@ export class AuthService {
     try {
       return await this.jwtService.signAsync(
         payload,
-        this.options('EXPIRES_ACCESS_HI', 'JWT_ACCESS_SECRET'),
+        this.options('EXPIRES_ACCESS', 'JWT_ACCESS_SECRET'),
+      );
+    } catch (e) {
+      throw new ForbiddenException(e);
+    }
+  }
+
+  private async signJwtToken(payload: PayloadDto): Promise<string> {
+    try {
+      return await this.jwtService.signAsync(
+        payload,
+        this.options('EXPIRES_ACCESS_HI', 'JWT_SECRET'),
       );
     } catch (e) {
       throw new ForbiddenException(e);
@@ -157,7 +181,7 @@ export class AuthService {
   private async verifyToken(token: string) {
     try {
       return await this.jwtService.verifyAsync(token, {
-        secret: this.config.get<string>('JWT_ACCESS_SECRET'),
+        secret: this.config.get<string>('JWT_SECRET'),
       });
     } catch (e) {
       throw new ForbiddenException(e);

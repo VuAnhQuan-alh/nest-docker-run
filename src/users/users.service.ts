@@ -14,12 +14,12 @@ export class UsersService {
   async handlerProfile(data: PayloadDto): Promise<ResponseDto<DataAccountDto>> {
     try {
       const { sub } = data;
-      const { _id, email, username, avatar, content, roles } =
+      const { _id, email, username, avatar, content, confirmed, roles } =
         await this.usersModel.findOne({ _id: sub });
 
       return {
         message: 'Get profile idol successful!',
-        data: { _id, email, username, avatar, content, roles },
+        attributes: { _id, email, username, avatar, content, confirmed, roles },
       };
     } catch (e) {
       throw new ForbiddenException(e);

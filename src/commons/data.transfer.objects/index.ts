@@ -42,6 +42,7 @@ export class TokenDto {
 
 export class ResponseDto<T = null> {
   message: string;
-  data: T;
+  attributes: T | object[];
   token?: TokenDto;
+  count?: number;
 }

@@ -5,14 +5,17 @@ import {
   Get,
   Post,
   Query,
+  Req,
   Res,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { DataSignInDto, DataSignUpDto } from './auth.dto';
-import { Response } from 'express';
-import { TokenDto } from '../commons/data.transfer.objects';
+import { DataAccountDto, DataSignInDto, DataSignUpDto } from './auth.dto';
+import { Request, Response } from 'express';
 import { Constants } from '../commons/constants';
+import { PayloadDto, ResponseDto } from '../commons/data.transfer.objects';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -43,9 +46,9 @@ export class AuthController {
   async login(
     @Res({ passthrough: true }) response: Response,
     @Body(new ValidationPipe()) data: DataSignInDto,
-  ): Promise<any> {
+  ): Promise<ResponseDto<DataAccountDto>> {
     const account = await this.authService.handlerSignIn(data);
-    if (!account.data) throw new BadRequestException(account.message);
+    if (!account.attributes) throw new BadRequestException(account.message);
 
     response.cookie('access_token', account.token.access, {
       path: this.prefix,
@@ -54,6 +57,27 @@ export class AuthController {
       path: this.prefix,
     });
 
-    return { message: account.message, data: account.data };
+    return { message: account.message, attributes: account.attributes };
+  }
+
+  @Get('refresh')
+  @UseGuards(AuthGuard('jwt-refresh'))
+  async refresh(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<ResponseDto<any>> {
+    const payload = request.user as PayloadDto;
+    const token = await this.authService.handlerRefreshToken(payload);
+    response.cookie('access_token', token, { path: this.prefix });
+
+    return { message: 'refresh token successful!', attributes: null };
+  }
+
+  @Get('logout')
+  logout(@Res({ passthrough: true }) response: Response): ResponseDto {
+    response.clearCookie('access_token', { path: this.prefix });
+    response.clearCookie('refresh_token', { path: this.prefix });
+
+    return { message: 'sign out successful!', attributes: null };
   }
 }

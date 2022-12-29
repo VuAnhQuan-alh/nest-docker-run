@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -68,6 +69,10 @@ export class DataAccountDto {
 
   @IsString()
   content: string | null;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  confirmed: boolean;
 
   @IsNotEmpty()
   @IsEnum(RolesEnum)

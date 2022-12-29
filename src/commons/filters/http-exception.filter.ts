@@ -13,7 +13,7 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     const response: Response = ctx.getResponse();
     const request: Request = ctx.getRequest();
     const statusCode = exception.getStatus();
-    const message = exception.message;
+    const message = exception.getResponse()['message'] || exception.message;
 
     response.status(statusCode).json({
       statusCode,
@@ -23,4 +23,3 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     });
   }
 }
-
