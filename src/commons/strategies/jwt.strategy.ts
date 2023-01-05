@@ -14,12 +14,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-access') {
           return request?.cookies?.access_token;
         },
       ]),
-      ignoreExpiration: true,
+      ignoreExpiration: false,
       secretOrKey: config.get<string>('JWT_ACCESS_SECRET'),
     });
   }
 
   validate(payload: PayloadDto) {
-    return payload;
+    const { sub, email, roles, confirmed } = payload;
+    return { sub, email, roles, confirmed };
   }
 }

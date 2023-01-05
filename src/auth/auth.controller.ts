@@ -5,17 +5,17 @@ import {
   Get,
   Post,
   Query,
-  Req,
   Res,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { DataAccountDto, DataSignInDto, DataSignUpDto } from './auth.dto';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { Constants } from '../commons/constants';
 import { PayloadDto, ResponseDto } from '../commons/data.transfer.objects';
 import { AuthGuard } from '@nestjs/passport';
+import { Payload } from '../commons/decorators/payload.decrators';
 
 @Controller('auth')
 export class AuthController {
@@ -63,10 +63,9 @@ export class AuthController {
   @Get('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
   async refresh(
-    @Req() request: Request,
+    @Payload() payload: PayloadDto,
     @Res({ passthrough: true }) response: Response,
   ): Promise<ResponseDto<any>> {
-    const payload = request.user as PayloadDto;
     const token = await this.authService.handlerRefreshToken(payload);
     response.cookie('access_token', token, { path: this.prefix });
 

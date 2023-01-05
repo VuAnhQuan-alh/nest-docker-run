@@ -1,8 +1,7 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Request } from 'express';
-import { PayloadDto } from '../commons/data.transfer.objects';
 import { JwtAuthGuard } from '../commons/guards/jwt.auth.guard';
+import { Payload } from '../commons/decorators/payload.decrators';
 
 @Controller('users')
 export class UsersController {
@@ -10,8 +9,7 @@ export class UsersController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findOne(@Req() request: Request) {
-    const payload = request.user as PayloadDto;
-    return this.usersService.handlerProfile(payload);
+  findOne(@Payload('sub') sub: string) {
+    return this.usersService.handlerProfile(sub);
   }
 }

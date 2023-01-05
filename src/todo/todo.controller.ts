@@ -6,7 +6,6 @@ import {
   Put,
   Param,
   Delete,
-  Req,
   UseGuards,
   Query,
   ValidationPipe,
@@ -14,10 +13,9 @@ import {
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { Request } from 'express';
-import { PayloadDto } from '../commons/data.transfer.objects';
 import { JwtAuthGuard } from '../commons/guards/jwt.auth.guard';
 import { QueryTodoDto } from './dto/query-todo.dto';
+import { Payload } from '../commons/decorators/payload.decrators';
 
 @Controller('todo')
 @UseGuards(JwtAuthGuard)
@@ -27,19 +25,17 @@ export class TodoController {
   @Post()
   create(
     @Body(new ValidationPipe()) createTodoDto: CreateTodoDto,
-    @Req() request: Request,
+    @Payload('sub') sub: string,
   ) {
-    const payload = request.user as PayloadDto;
-    return this.todoService.create(createTodoDto, payload);
+    return this.todoService.create(createTodoDto, sub);
   }
 
   @Get()
   findAll(
     @Query(new ValidationPipe()) query: QueryTodoDto,
-    @Req() request: Request,
+    @Payload('sub') sub: string,
   ) {
-    const payload = request.user as PayloadDto;
-    return this.todoService.findAll(query, payload);
+    return this.todoService.findAll(query, sub);
   }
 
   @Get(':id')
@@ -51,13 +47,13 @@ export class TodoController {
   update(
     @Param('id') id: string,
     @Body(new ValidationPipe()) updateTodoDto: UpdateTodoDto,
+    @Payload('sub') sub: string,
   ) {
-    return this.todoService.update(id, updateTodoDto);
+    return this.todoService.update(id, updateTodoDto, sub);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() request: Request) {
-    const payload = request.user as PayloadDto;
-    return this.todoService.remove(id, payload);
+  remove(@Param('id') id: string, @Payload('sub') sub: string) {
+    return this.todoService.remove(id, sub);
   }
 }

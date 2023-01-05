@@ -1,26 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ResponseDto } from '../commons/data.transfer.objects';
+import { Favorites, FavoritesDoc } from './favorites.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class FavoritesService {
-  create(createFavoriteDto: CreateFavoriteDto) {
-    return 'This action adds a new favorite';
+  constructor(
+    @InjectModel(Favorites.name)
+    private readonly favoritesModel: Model<FavoritesDoc>,
+  ) {}
+
+  async create(
+    modelId: string,
+    ownerId: string,
+  ): Promise<ResponseDto<FavoritesDoc>> {
+    try {
+      const result = await this.favoritesModel.create({ modelId, ownerId });
+      return { message: 'Created a favorites successful!', attributes: result };
+    } catch (e) {
+      throw new ForbiddenException(e);
+    }
   }
 
-  findAll() {
-    return `This action returns all favorites`;
+  async findAll(id: string): Promise<ResponseDto<FavoritesDoc[]>> {
+    try {
+      const result = await this.favoritesModel.find({ modelId: id });
+      return { message: 'Get all favorites successful!', attributes: result };
+    } catch (e) {
+      throw new ForbiddenException(e);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} favorite`;
-  }
-
-  update(id: number, updateFavoriteDto: UpdateFavoriteDto) {
-    return `This action updates a #${id} favorite`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} favorite`;
+  async remove(modelId: string, ownerId: string): Promise<ResponseDto<any>> {
+    try {
+      const result = await this.favoritesModel.deleteOne({ modelId, ownerId });
+      return { message: 'Unfavorite a model successful!', attributes: result };
+    } catch (e) {
+      throw new ForbiddenException(e);
+    }
   }
 }

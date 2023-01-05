@@ -18,7 +18,7 @@ interface Meta {
   pageSize: number;
   pageCount: number;
   total: number;
-  count: number;
+  amount: number;
 }
 
 @Injectable()
@@ -39,7 +39,7 @@ export class TransformInterceptor implements NestInterceptor {
               data.count / (+query.pageSize || Constants.pageSize),
             ),
             total: data.count,
-            count: data.attributes.length,
+            amount: data.attributes.length,
           };
         } else {
           meta = {};

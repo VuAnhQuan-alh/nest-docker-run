@@ -14,12 +14,13 @@ export class JwtRefStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
           return request?.cookies?.refresh_token;
         },
       ]),
-      ignoreExpiration: true,
+      ignoreExpiration: false,
       secretOrKey: config.get('JWT_REFRESH_SECRET'),
     });
   }
 
   validate(payload: PayloadDto) {
-    return payload;
+    const { sub, email, roles, confirmed } = payload;
+    return { sub, email, roles, confirmed };
   }
 }

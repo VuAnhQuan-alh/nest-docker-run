@@ -11,11 +11,10 @@ export class UsersService {
     @InjectModel(Users.name) private readonly usersModel: Model<UsersDoc>,
   ) {}
 
-  async handlerProfile(data: PayloadDto): Promise<ResponseDto<DataAccountDto>> {
+  async handlerProfile(ownerId: string): Promise<ResponseDto<DataAccountDto>> {
     try {
-      const { sub } = data;
       const { _id, email, username, avatar, content, confirmed, roles } =
-        await this.usersModel.findOne({ _id: sub });
+        await this.usersModel.findOne({ _id: ownerId });
 
       return {
         message: 'Get profile idol successful!',

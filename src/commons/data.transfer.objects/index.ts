@@ -3,6 +3,8 @@ import {
   IsBoolean,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
+  IsNumberString,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -45,4 +47,26 @@ export class ResponseDto<T = null> {
   attributes: T | object[];
   token?: TokenDto;
   count?: number;
+}
+
+export class PaginationDto {
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  search?: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsNumberString()
+  page?: number;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  skip?: number;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsNumberString()
+  pageSize?: number;
 }

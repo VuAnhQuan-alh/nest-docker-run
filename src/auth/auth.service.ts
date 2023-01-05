@@ -131,11 +131,11 @@ export class AuthService {
     try {
       const [access, refresh] = await Promise.all([
         this.jwtService.signAsync(
-          payload,
+          { ...payload },
           this.options('EXPIRES_ACCESS', 'JWT_ACCESS_SECRET'),
         ),
         this.jwtService.signAsync(
-          payload,
+          { ...payload },
           this.options('EXPIRES_REFRESH', 'JWT_REFRESH_SECRET'),
         ),
       ]);
@@ -148,7 +148,7 @@ export class AuthService {
   private async signAccessToken(payload: PayloadDto): Promise<string> {
     try {
       return await this.jwtService.signAsync(
-        payload,
+        { ...payload },
         this.options('EXPIRES_ACCESS', 'JWT_ACCESS_SECRET'),
       );
     } catch (e) {
@@ -159,7 +159,7 @@ export class AuthService {
   private async signJwtToken(payload: PayloadDto): Promise<string> {
     try {
       return await this.jwtService.signAsync(
-        payload,
+        { ...payload },
         this.options('EXPIRES_ACCESS_HI', 'JWT_SECRET'),
       );
     } catch (e) {
@@ -170,7 +170,7 @@ export class AuthService {
   private async signMailerToken(payload: PayloadDto): Promise<string> {
     try {
       return await this.jwtService.signAsync(
-        payload,
+        { ...payload },
         this.options('EXPIRES_MAILER', 'MAIL_SECRET'),
       );
     } catch (e) {
