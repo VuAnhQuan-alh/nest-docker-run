@@ -31,8 +31,8 @@ export class CommentsController {
   }
 
   @Get(':id')
-  findAll(@Param('id') id: string): Promise<ResponseDto<CommentsDoc[]>> {
-    return this.commentsService.findAll(id);
+  findAll(@Param('id') modelId: string): Promise<ResponseDto<CommentsDoc[]>> {
+    return this.commentsService.findAll(modelId);
   }
 
   @Put(':id')

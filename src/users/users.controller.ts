@@ -4,11 +4,11 @@ import { JwtAuthGuard } from '../commons/guards/jwt.auth.guard';
 import { Payload } from '../commons/decorators/payload.decrators';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
+  @Get('me')
   findOne(@Payload('sub') sub: string) {
     return this.usersService.handlerProfile(sub);
   }

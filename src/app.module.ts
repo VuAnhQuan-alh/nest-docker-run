@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
 import { CoreModule } from './core/core.module';
 import { AuthModule } from './auth/auth.module';
 import { TodoModule } from './todo/todo.module';
@@ -10,6 +11,7 @@ import { SongsModule } from './songs/songs.module';
 import { CommentsModule } from './comments/comments.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -36,6 +38,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       }),
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     CoreModule,
     AuthModule,
     UsersModule,
@@ -44,6 +47,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     SongsModule,
     CommentsModule,
     FavoritesModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

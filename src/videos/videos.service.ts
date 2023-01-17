@@ -1,14 +1,13 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
-import { PayloadDto, ResponseDto } from '../commons/data.transfer.objects';
+import { ResponseDto } from '../commons/data.transfer.objects';
 import { Videos, VideosDoc } from './videos.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comments, CommentsDoc } from '../comments/comments.schema';
 import { Favorites, FavoritesDoc } from '../favorites/favorites.schema';
 import { QueriesVideoDto } from './dto/queries-video.dto';
-import { Constants } from '../commons/constants';
 
 @Injectable()
 export class VideosService {

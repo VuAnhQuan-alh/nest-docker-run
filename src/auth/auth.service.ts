@@ -104,7 +104,7 @@ export class AuthService {
 
       return {
         message: 'login successful!',
-        attributes: { _id, email, username, avatar, content, confirmed, roles },
+        attributes: { email, username, avatar, content, confirmed, roles },
         token: token as TokenDto,
       };
     } catch (e) {

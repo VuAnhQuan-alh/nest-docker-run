@@ -5,13 +5,11 @@ import {
   Get,
   Post,
   Query,
-  Res,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { DataAccountDto, DataSignInDto, DataSignUpDto } from './auth.dto';
-import { Response } from 'express';
 import { Constants } from '../commons/constants';
 import { PayloadDto, ResponseDto } from '../commons/data.transfer.objects';
 import { AuthGuard } from '@nestjs/passport';
@@ -44,39 +42,28 @@ export class AuthController {
 
   @Post('login')
   async login(
-    @Res({ passthrough: true }) response: Response,
     @Body(new ValidationPipe()) data: DataSignInDto,
   ): Promise<ResponseDto<DataAccountDto>> {
     const account = await this.authService.handlerSignIn(data);
     if (!account.attributes) throw new BadRequestException(account.message);
 
-    response.cookie('access_token', account.token.access, {
-      path: this.prefix,
-    });
-    response.cookie('refresh_token', account.token.refresh, {
-      path: this.prefix,
-    });
-
-    return { message: account.message, attributes: account.attributes };
+    return account;
   }
 
   @Get('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
-  async refresh(
-    @Payload() payload: PayloadDto,
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<ResponseDto<any>> {
+  async refresh(@Payload() payload: PayloadDto): Promise<ResponseDto<any>> {
     const token = await this.authService.handlerRefreshToken(payload);
-    response.cookie('access_token', token, { path: this.prefix });
 
-    return { message: 'refresh token successful!', attributes: null };
+    return {
+      message: 'refresh token successful!',
+      attributes: null,
+      token: { access: token },
+    };
   }
 
   @Get('logout')
-  logout(@Res({ passthrough: true }) response: Response): ResponseDto {
-    response.clearCookie('access_token', { path: this.prefix });
-    response.clearCookie('refresh_token', { path: this.prefix });
-
+  logout(): ResponseDto {
     return { message: 'sign out successful!', attributes: null };
   }
 }

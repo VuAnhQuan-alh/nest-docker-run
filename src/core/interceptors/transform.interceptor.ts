@@ -45,7 +45,11 @@ export class TransformInterceptor implements NestInterceptor {
           meta = {};
         }
         return {
-          data: { message: data.message, attributes: data.attributes },
+          data: {
+            message: data.message,
+            attributes: data.attributes,
+            token: data?.token,
+          },
           meta: meta,
         };
       }),

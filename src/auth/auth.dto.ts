@@ -7,8 +7,6 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Types } from 'mongoose';
-import { Type } from 'class-transformer';
 import { RolesEnum } from '../commons/constants';
 
 export class DataSignInDto {
@@ -52,10 +50,6 @@ export class DataSignUpDto {
 }
 
 export class DataAccountDto {
-  @IsNotEmpty()
-  @Type(() => Types.ObjectId)
-  _id: Types.ObjectId;
-
   @IsNotEmpty()
   @IsEmail()
   email: string;
