@@ -48,6 +48,11 @@ export class VideosController {
     return this.videosService.findByOwner(sub);
   }
 
+  @Get('owner/:id')
+  findOfOwner(@Param('id') id: string) {
+    return `this all video of owner ${id}`;
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string): Promise<ResponseDto<VideosDoc>> {
     return this.videosService.findOne(id);

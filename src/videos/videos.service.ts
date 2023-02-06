@@ -44,6 +44,9 @@ export class VideosService {
             title: { $regex: search ?? '' },
             isVisibility: true,
           })
+          .select(['-updatedAt'])
+          .populate('ownerId', ['username', 'avatar'])
+          .populate('favoritesId')
           .skip(skip)
           .limit(pageSize),
         this.videosModel.count(),
@@ -71,7 +74,12 @@ export class VideosService {
   async findOne(id: string): Promise<ResponseDto<VideosDoc>> {
     try {
       const result = await this.videosModel.findOne({ _id: id });
-      return { message: 'Get a video successful!', attributes: result };
+      return {
+        message: result
+          ? 'Get a video successful!'
+          : `Not found a video by ${id}`,
+        attributes: result,
+      };
     } catch (e) {
       throw new ForbiddenException(e);
     }

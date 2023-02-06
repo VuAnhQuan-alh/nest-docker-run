@@ -10,7 +10,7 @@ import { VideosModule } from './videos/videos.module';
 import { SongsModule } from './songs/songs.module';
 import { CommentsModule } from './comments/comments.module';
 import { FavoritesModule } from './favorites/favorites.module';
-import { MailerModule } from '@nestjs-modules/mailer';
+// import { MailerModule } from '@nestjs-modules/mailer';
 import { NotificationModule } from './notification/notification.module';
 
 @Module({
@@ -22,22 +22,22 @@ import { NotificationModule } from './notification/notification.module';
       }),
       inject: [ConfigService],
     }),
-    MailerModule.forRootAsync({
-      useFactory: (config: ConfigService) => ({
-        transport: {
-          host: config.get<string>('MAIL_HOST'),
-          secure: false,
-          auth: {
-            user: config.get<string>('MAIL_USER'),
-            pass: config.get<string>('MAIL_PASS'),
-          },
-        },
-        defaults: {
-          from: '"No Reply" <noreply@example.com>',
-        },
-      }),
-      inject: [ConfigService],
-    }),
+    // MailerModule.forRootAsync({
+    //   useFactory: (config: ConfigService) => ({
+    //     transport: {
+    //       host: config.get<string>('MAIL_HOST'),
+    //       secure: false,
+    //       auth: {
+    //         user: config.get<string>('MAIL_USER'),
+    //         pass: config.get<string>('MAIL_PASS'),
+    //       },
+    //     },
+    //     defaults: {
+    //       from: '"No Reply" <noreply@example.com>',
+    //     },
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     ScheduleModule.forRoot(),
     CoreModule,
     AuthModule,
